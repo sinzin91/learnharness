@@ -17,11 +17,11 @@ docker build -f deploy/Dockerfile -t learnharness:dev .
 
 The image is built for the architecture of the machine that builds it, because `npm ci` installs that platform's native `@resvg/resvg-js` and `@napi-rs/canvas` prebuilds. Build on the host that will run the image, or on one of the same architecture.
 
-| Image | Unpacked (`docker images`) | Compressed (`docker image inspect`) |
+| Image | `docker images` | `docker image inspect` `.Size` |
 | --- | --- | --- |
 | `linux/arm64` | 1.04 GB | 273 MB |
 
-The other builds have not been measured. An `amd64` host builds its own image from the same Dockerfile. The build stage uses about 3.2 GB of disk.
+The first figure is the unpacked size. The second is the compressed size on the containerd image store; other image stores can report differently. Other architectures have not been measured. An `amd64` host builds its own image from the same Dockerfile. The build stage uses about 3.2 GB of disk.
 
 The Dockerfile uses no BuildKit-only syntax, so it builds with or without `buildx`. The legacy builder prints a deprecation notice but works. The root `.dockerignore` keeps `data/`, key files and `.env*` files out of the build context.
 
@@ -90,8 +90,10 @@ Same-origin routes, including the Claude Code status check and subscription sign
 docker image inspect learnharness:dev --format '{{.Os}}/{{.Architecture}} {{.Size}}'
 docker run --rm -d --name lh-smoke -p 127.0.0.1:3100:3000 \
   -v lh-smoke-data:/data -v lh-smoke-auth:/auth learnharness:dev
+sleep 3
 
-for route in / /api/graph /api/models /api/settings; do
+asset=$(curl -s http://127.0.0.1:3100/ | grep -o '/_next/static/[^"]*\.js' | head -1)
+for route in / /api/graph /api/models /api/settings "$asset"; do
   curl -s -o /dev/null -w "$route %{http_code}\n" "http://127.0.0.1:3100$route"
 done
 docker exec lh-smoke id
@@ -122,4 +124,6 @@ To change the CLI version, rebuild with `--build-arg CLAUDE_CODE_VERSION=<versio
 
 - **Demo verification is not included.** It needs Chromium, which the image does not contain, so it fails. The rest of the app is unaffected.
 - **ChatGPT sign-in needs a browser on the server's machine.** Its callback listens on `127.0.0.1` inside the container. GitHub Copilot and Grok use device codes. See [subscription connections in web/dev](../docs/development.md#subscription-connections-in-webdev).
+- **Visual text is limited to DejaVu's coverage.** Latin, Greek, and Cyrillic render. Scripts such as CJK, Arabic, and Devanagari do not, because the image carries no fonts for them.
+- **There is no system CA store.** Node and the CLI use their built-in roots, so a private CA or TLS-inspecting proxy needs extra configuration.
 - **The server is single-user.** Everyone connected shares the same records, keys, and credentials.
