@@ -3,21 +3,22 @@
 
 # Records and secrets: never enter the build, on top of the refusals in
 # scripts/build-server.mjs.
-**/data
-**/.fresh-data
-**/.memory
-**/real-data-extraction
+/data
+/.fresh-data
+/.memory
+/real-data-extraction
+/SCOPE.md
 **/auth.json
-**/chatgpt-credentials.json*
-**/github-copilot-credentials.json*
-**/xai-credentials.json*
+**/*credentials*.json*
 **/.env*
-**/SCOPE.md
+**/.npmrc
+**/*.pem
+**/*.key
 
 # Build output and host-platform dependencies.
 **/node_modules
 **/.next
-**/dist
+/dist
 **/*.tsbuildinfo
 **/*.log
 **/.DS_Store
