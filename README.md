@@ -72,9 +72,29 @@ npm run dev        # http://localhost:3000
 npm test           # fixtures and fake providers
 ```
 
-See the [documentation index](docs/README.md) for all guides, [development](docs/development.md) for setup and checks, [architecture](docs/architecture.md) for the runtime, [keyboard shortcuts](docs/keyboard.md), and [desktop builds and releases](docs/desktop-release.md).
+See the [documentation index](docs/README.md) for all guides, [development](docs/development.md) for setup and checks, [architecture](docs/architecture.md) for the runtime, [keyboard shortcuts](docs/keyboard.md), [desktop builds and releases](docs/desktop-release.md), and the [Linux container](deploy/README.md).
 
 Questions, bug reports, and feature requests: [GitHub Issues](https://github.com/amosblomqvist/learnharness/issues).
+
+## Keeping the fork in sync
+
+This repository is a fork of [amosblomqvist/learnharness](https://github.com/amosblomqvist/learnharness), which is its `upstream` remote. To take upstream changes:
+
+```bash
+git remote add upstream https://github.com/amosblomqvist/learnharness.git   # first time only
+git fetch upstream
+git switch main
+git merge upstream/main
+# resolve any conflicts, then re-run the checks
+npm ci
+npm run lint
+npm run typecheck
+npm test
+docker build -f deploy/Dockerfile -t learnharness:dev .
+git tag <tag>
+```
+
+Keep the AGPL-3.0 license, its notices, and the original attribution intact.
 
 ## License
 
