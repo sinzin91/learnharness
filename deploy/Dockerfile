@@ -33,7 +33,6 @@ ENV NODE_ENV=production \
     PORT=3000 \
     LH_DATA_DIR=/data \
     LH_AUTH_FILE=/auth/auth.json \
-    HOME=/home/node \
     DISABLE_AUTOUPDATER=1
 # resvg rasterizes visuals with system fonts and finds them through
 # /etc/fonts/fonts.conf; without both packages, SVG text renders blank.
@@ -41,8 +40,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends fontconfig-config fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \
     && npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
-    && rm -rf /home/node/.npm \
+    && npm cache clean --force \
     && install -d -o 1000 -g 1000 -m 0700 /data /auth
+# Set after the root install above so that it leaves nothing in this home.
+ENV HOME=/home/node
 WORKDIR /app
 # The server tree stays root-owned: only /data, /auth and HOME are writable.
 COPY --from=build /app/.next/standalone ./
