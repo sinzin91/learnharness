@@ -1,0 +1,32 @@
+# Build context for deploy/Dockerfile. Lives at the root because the legacy
+# builder ignores per-Dockerfile ignore files.
+
+# Records and secrets: never enter the build, on top of the refusals in
+# scripts/build-server.mjs.
+**/data
+**/.fresh-data
+**/.memory
+**/real-data-extraction
+**/auth.json
+**/chatgpt-credentials.json*
+**/github-copilot-credentials.json*
+**/xai-credentials.json*
+**/.env*
+**/SCOPE.md
+
+# Build output and host-platform dependencies.
+**/node_modules
+**/.next
+**/dist
+**/*.tsbuildinfo
+**/*.log
+**/.DS_Store
+
+# Not needed to build the server.
+.git
+.github
+.dockerignore
+build
+deploy
+docs
+tests
