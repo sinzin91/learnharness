@@ -20,7 +20,7 @@ ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npx next build && node scripts/build-server.mjs
+RUN npm run build && node scripts/build-server.mjs
 
 FROM ${NODE_IMAGE} AS runtime
 # npm links the claude executable into /usr/local/bin, a location the Claude
@@ -41,7 +41,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends fontconfig-config fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \
     && npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
-    && npm cache clean --force \
+    && rm -rf /home/node/.npm \
     && install -d -o 1000 -g 1000 -m 0700 /data /auth
 WORKDIR /app
 # The server tree stays root-owned: only /data, /auth and HOME are writable.
