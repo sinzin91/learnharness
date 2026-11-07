@@ -127,3 +127,7 @@ To change the CLI version, rebuild with `--build-arg CLAUDE_CODE_VERSION=<versio
 - **Visual text is limited to DejaVu's coverage.** Latin, Greek, and Cyrillic render. Scripts such as CJK, Arabic, and Devanagari do not, because the image carries no fonts for them.
 - **There is no system CA store.** Node and the CLI use their built-in roots, so a private CA or TLS-inspecting proxy needs extra configuration.
 - **The server is single-user.** Everyone connected shares the same records, keys, and credentials.
+
+## License
+
+LearnHarness is licensed under [AGPL-3.0](../LICENSE). If other people use a modified version over a network, section 13 requires you to offer them its source.
