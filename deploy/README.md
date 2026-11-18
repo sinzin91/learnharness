@@ -34,6 +34,7 @@ The Dockerfile uses no BuildKit-only syntax, so it builds with or without `build
 
 ```sh
 docker run -d --name learnharness --init --restart unless-stopped \
+  --cap-drop ALL --security-opt no-new-privileges:true \
   -p 127.0.0.1:3000:3000 \
   -v learnharness-data:/data \
   -v learnharness-auth:/auth \
@@ -43,7 +44,9 @@ docker run -d --name learnharness --init --restart unless-stopped \
 
 This binds the port to loopback so that a private network or proxy on the host can front it. `--init` is recommended for a long-lived container because Node as process 1 does not reap orphaned processes. `--env-file` is optional; keep that file readable only by its owner.
 
-The server runs as uid/gid 1000 and its tree is read-only to that user.
+The server runs as uid/gid 1000 and its tree is read-only to that user. The server needs no Linux capabilities, so `--cap-drop ALL` and `no-new-privileges` cost nothing.
+
+Anyone who can reach the port can run code as that user, for example through the answer to a Coding Questions problem, which its tests execute. That code can read the container's environment, including `CLAUDE_CODE_OAUTH_TOKEN`, and the files in `/auth`. Treat access to the port as access to those credentials.
 
 ### Volumes
 
@@ -96,6 +99,7 @@ docker run --rm -d --name lh-smoke -p 127.0.0.1:3100:3000 \
 sleep 3
 
 asset=$(curl -s http://127.0.0.1:3100/ | grep -o '/_next/static/[^"]*\.js' | head -1)
+[ -n "$asset" ] || echo "no static asset found on /"
 for route in / /api/graph /api/models /api/settings /api/plugins "$asset"; do
   curl -s -o /dev/null -w "$route %{http_code}\n" "http://127.0.0.1:3100$route"
 done
