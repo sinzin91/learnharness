@@ -12,6 +12,7 @@
 **/auth.json
 **/*credentials*.json*
 **/.env*
+**/*.env
 **/.npmrc
 **/*.pem
 **/*.key
