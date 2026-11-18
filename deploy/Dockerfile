@@ -20,7 +20,11 @@ ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build && node scripts/build-server.mjs
+# Core plugins (flashcards, coding-questions, drawing-pad, rich-code-blocks)
+# are separate npm projects under plugins/. plugins:setup installs their
+# locked dependencies; npm run build then bundles them into core-plugins/,
+# which build-server.mjs copies into the standalone tree.
+RUN npm run plugins:setup && npm run build && node scripts/build-server.mjs
 
 FROM ${NODE_IMAGE} AS runtime
 # npm links the claude executable into /usr/local/bin, a location the Claude
