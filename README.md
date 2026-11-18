@@ -68,33 +68,38 @@ All three platforms support in-app updates.
 
 ```bash
 npm ci
+npm run plugins:setup
 npm run dev        # http://localhost:3000
 npm test           # fixtures and fake providers
 ```
 
-See the [documentation index](docs/README.md) for all guides, [development](docs/development.md) for setup and checks, [architecture](docs/architecture.md) for the runtime, [keyboard shortcuts](docs/keyboard.md), [desktop builds and releases](docs/desktop-release.md), and the [Linux container](deploy/README.md).
+See the [documentation index](docs/README.md) for all guides, [development](docs/development.md) for setup and checks, [architecture](docs/architecture.md) for the runtime, [keyboard shortcuts](docs/keyboard.md), [themes](docs/themes.md) for the theme file format, [desktop builds and releases](docs/desktop-release.md), and the [Linux container](deploy/README.md).
+
+For trusted local plugins, start with the [authoring guide and capability map](docs/plugin-authoring.md). It links the question, practice-problem, submission, view-context and UI contracts. Use [`examples/plugins/`](examples/plugins/) for small runnable templates, [`plugins/`](plugins/) for feature source projects, and the [host architecture](docs/plugin-architecture.md) for internals.
 
 Questions, bug reports, and feature requests: [GitHub Issues](https://github.com/amosblomqvist/learnharness/issues).
 
+Security vulnerabilities: report privately as described in [SECURITY.md](SECURITY.md), not in public issues.
+
 ## Keeping the fork in sync
 
-This repository is a fork of [amosblomqvist/learnharness](https://github.com/amosblomqvist/learnharness), which is its `upstream` remote. To take upstream changes:
+This repository is a fork of [amosblomqvist/learnharness](https://github.com/amosblomqvist/learnharness), which is its `upstream` remote. Take upstream changes by merging a release tag, not `upstream/main`, so the fork pins a released version:
 
 ```bash
 git remote add upstream https://github.com/amosblomqvist/learnharness.git   # first time only
-git fetch upstream
-git switch main
-git merge upstream/main
-# resolve any conflicts, then re-run the checks
+git fetch upstream --tags
+git switch -c sync/<release> main
+git merge --no-ff <release>          # for example v0.6.1
+# resolve any conflicts, keeping the packaging files, then re-run the checks
 npm ci
+npm run plugins:setup
 npm run lint
 npm run typecheck
 npm test
 docker build -f deploy/Dockerfile -t learnharness:dev .
-git tag <tag>
 ```
 
-Keep the AGPL-3.0 license, its notices, and the original attribution intact.
+Open a pull request against `main`, then smoke-test the image as in [Verify](deploy/README.md#verify) and read [Upgrading](deploy/README.md#upgrading) for one-way data changes. Keep the AGPL-3.0 license, its notices, and the original attribution intact.
 
 ## License
 

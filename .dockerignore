@@ -3,7 +3,7 @@
 
 # Records and secrets: never enter the build, on top of the refusals in
 # scripts/build-server.mjs.
-/data
+**/data
 /.fresh-data
 /.memory
 /real-data-extraction
@@ -11,6 +11,7 @@
 **/auth.json
 **/*credentials*.json*
 **/.env*
+**/*.env
 **/.npmrc
 **/*.pem
 **/*.key
@@ -19,15 +20,21 @@
 **/node_modules
 **/.next
 /dist
+# Plugin outputs a dev checkout may hold; the build regenerates them.
+/core-plugins
+/.core-plugins-*
+/public/plugin-authoring
+/plugins/*/dist
+/plugins/*/.sdk
 **/*.tsbuildinfo
 **/*.log
 **/.DS_Store
 
 # Not needed to build the server.
-.git
+**/.git
 .github
 .dockerignore
 build
 deploy
-docs
 tests
+# docs/ stays in: the build packs the plugin-authoring guides from it.
