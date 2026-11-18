@@ -83,23 +83,23 @@ Security vulnerabilities: report privately as described in [SECURITY.md](SECURIT
 
 ## Keeping the fork in sync
 
-This repository is a fork of [amosblomqvist/learnharness](https://github.com/amosblomqvist/learnharness), which is its `upstream` remote. To take upstream changes:
+This repository is a fork of [amosblomqvist/learnharness](https://github.com/amosblomqvist/learnharness), which is its `upstream` remote. Take upstream changes by merging a release tag, not `upstream/main`, so the fork pins a released version:
 
 ```bash
 git remote add upstream https://github.com/amosblomqvist/learnharness.git   # first time only
-git fetch upstream
-git switch main
-git merge upstream/main
-# resolve any conflicts, then re-run the checks
+git fetch upstream --tags
+git switch -c sync/<release> main
+git merge --no-ff <release>          # for example v0.6.1
+# resolve any conflicts, keeping the packaging files, then re-run the checks
 npm ci
+npm run plugins:setup
 npm run lint
 npm run typecheck
 npm test
 docker build -f deploy/Dockerfile -t learnharness:dev .
-git tag <tag>
 ```
 
-Keep the AGPL-3.0 license, its notices, and the original attribution intact.
+Open a pull request against `main`, then smoke-test the image as in [Verify](deploy/README.md#verify) and read [Upgrading](deploy/README.md#upgrading) for one-way data changes. Keep the AGPL-3.0 license, its notices, and the original attribution intact.
 
 ## License
 
