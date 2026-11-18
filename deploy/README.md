@@ -23,7 +23,7 @@ The build runs `npm run plugins:setup`, which installs each plugin project's loc
 
 The first figure is the unpacked size. The second is the compressed size on the containerd image store; other image stores can report differently. Other architectures have not been measured. An `amd64` host builds its own image from the same Dockerfile. The build stage uses about 4.5 GB of disk.
 
-The Dockerfile uses no BuildKit-only syntax, so it builds with or without `buildx`. The legacy builder prints a deprecation notice but works. The root `.dockerignore` keeps `data/`, key files and `.env*` files out of the build context.
+The Dockerfile uses no BuildKit-only syntax, so it builds with or without `buildx`. The legacy builder prints a deprecation notice but works. The root `.dockerignore` keeps `data/`, key files, `.env*` and `*.env` files out of the build context.
 
 | Build argument | Default | Purpose |
 | --- | --- | --- |
@@ -35,6 +35,7 @@ The Dockerfile uses no BuildKit-only syntax, so it builds with or without `build
 ```sh
 docker run -d --name learnharness --init --restart unless-stopped \
   --cap-drop ALL --security-opt no-new-privileges:true \
+  --memory 2g --cpus 2 --pids-limit 512 \
   -p 127.0.0.1:3000:3000 \
   -v learnharness-data:/data \
   -v learnharness-auth:/auth \
@@ -44,7 +45,7 @@ docker run -d --name learnharness --init --restart unless-stopped \
 
 This binds the port to loopback so that a private network or proxy on the host can front it. `--init` is recommended for a long-lived container because Node as process 1 does not reap orphaned processes. `--env-file` is optional; keep that file readable only by its owner.
 
-The server runs as uid/gid 1000 and its tree is read-only to that user. The server needs no Linux capabilities, so `--cap-drop ALL` and `no-new-privileges` cost nothing.
+The server runs as uid/gid 1000 and its tree is read-only to that user. The server needs no Linux capabilities, so `--cap-drop ALL` and `no-new-privileges` cost nothing. The limits bound what runaway submitted code can consume; an idle server uses about 200 MiB and a dozen processes.
 
 Anyone who can reach the port can run code as that user, for example through the answer to a Coding Questions problem, which its tests execute. That code can read the container's environment, including `CLAUDE_CODE_OAUTH_TOKEN`, and the files in `/auth`. Treat access to the port as access to those credentials.
 
