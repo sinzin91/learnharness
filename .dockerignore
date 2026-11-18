@@ -3,8 +3,7 @@
 
 # Records and secrets: never enter the build, on top of the refusals in
 # scripts/build-server.mjs.
-/data
-/plugins/*/data
+**/data
 /.fresh-data
 /.memory
 /real-data-extraction
@@ -32,7 +31,7 @@
 **/.DS_Store
 
 # Not needed to build the server.
-.git
+**/.git
 .github
 .dockerignore
 build
